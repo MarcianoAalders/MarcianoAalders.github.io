@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta "theme_color": "#2196F3">
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/ractive"></script>
+    <link rel="manifest" href="/manifest.json">
+</head>
+
+<body>
+    <!-- Target -->
+    <div id="container">
+
+    </div>
+
+    <script id="template" type=text/ractive>
+        <input type="text" value={{search}}>
+
+        <table>
+        <locs data="{{locations}}" search="{{search}}"></locs>
+        </table>
+    </script>
+
+    <script id="template2" type=text/ractive>
+        {{#data:i}}
+             {{#if name.toLowerCase().includes(search.toLowerCase())}}
+                <tr>
+                    <td>{{ name  }}</td>
+                    <td>{{ country }}</td>
+                    <td>{{ coord.lon }}</td>
+                    <td>{{ coord.lat }}</td>
+                </tr>
+            {{/if}}
+        {{/data}}
+    </script>
+
+    <script>
+        var locs = Ractive.extend({
+            template: '#template2'
+        });
+
+        var ractive = new Ractive({
+            el: '#container',
+            template: '#template',
+            components: {
+                "locs": locs
+            },
+            data: {
+                locations: "",
+                input: ""
+            }
+        });
+
+        ractive.on({
+
+            checkInput: function (e) {
+                console.log(e.node.value);
+                ractive.set("input", e.node.value);
+            }
+
+        });
+
+        fetch("https://www.dennisvanriet.nl/ractive_rest/ractive_data.php?size=1000")
+        .then(function(response){
+            console.log(response);
+            return response.json();
+        }) .then(function(response){
+            console.log(response);
+            ractive.set("locations", response);
+        });
+
+        
+        
+    </script>
+
+</body>
+
+</html>
